@@ -1,5 +1,5 @@
 """
-URL configuration for api project.
+URL configuration for soc_analyzer project.
 
 The `urlpatterns` list routes URLs to views. For more information please see:
     https://docs.djangoproject.com/en/5.1/topics/http/urls/
@@ -17,10 +17,10 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 
-from fileupload.views import FileUploadView
+from app.api.views import FileUploadView
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('upload/', FileUploadView.as_view(), name='file-upload'),
-    path('api/', include('fileupload.urls')),
+    path('soc_analyzer/', include('app.api.urls')),
 ]

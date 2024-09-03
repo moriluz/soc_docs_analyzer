@@ -1,0 +1,11 @@
+summarize this list of summaries into a single summary that contains the most important blocks.
+The summary should include potential threads or issues within the organization related to Security, Availability, Confidentiality, Integrity and Privacy.
+
+<expected-response-format>
+  The response should be a JSON object containing `Summary` object.
+
+  `Summary` object should have the following properties:
+  - `name`: The name of the company which was reviewed in the report.
+  - `summary`: The summary you created from the PDF.
+  - `errorMessage`: A message describing why you chose to reject the request OR `null`.
+</expected-response-format>

@@ -1,5 +1,6 @@
 import json
 from .ai_integration import call_ai_model
+from .render_prompt import render_prompt
 
 
 def analyze_document(content, prompt):
@@ -7,18 +8,21 @@ def analyze_document(content, prompt):
     chunks = split_content(content)
     execution_order = 1
 
-    # todo maybe use sliding window (overlap some text between chunks) to preserve context between chunks
     for chunk in chunks:
+        print(f"Summarizing chunk ${execution_order}")
         chunk_insights = call_ai_model(chunk, prompt)
         chunk_insights_dict = json.loads(chunk_insights)
         insights.append(chunk_insights_dict)
         execution_order += 1
 
-    return json.dumps(chunk_insights_dict, indent=2)
-    # return json.dumps(insights, indent=2)
+    print(f"Summarizing list of summaries of size ${insights.__len__()}")
+    summarize_prompt = render_prompt("summarize_prompt.jinja2")
+    insights_summary = call_ai_model(insights, summarize_prompt)
+
+    print("Return summarized response")
+    return insights_summary
 
 
-# todo remove spaces and redundant data to save tokens.
 def split_content(content, max_tokens=2000):
     paragraphs = content.split("\n\n")
     chunks = []

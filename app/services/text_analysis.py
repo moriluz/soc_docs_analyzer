@@ -1,24 +1,44 @@
 import json
-from .ai_integration import call_ai_model
+import time
+
+import chromadb
+from chromadb.api.models.Collection import Collection
+from langchain.embeddings import OpenAIEmbeddings
+from langchain.vectorstores import Chroma
+
+from .ai_integration import call_model, query_similar_chunks, create_embeddings, generate_embeddings
+
+chroma_client = chromadb.PersistentClient(path="/Users/mor.iluz/Desktop/chroma")
+
 
 
 def analyze_document(content, prompt):
-    insights = []
+    collection: Collection = chroma_client.create_collection(name=f"collection_{int(time.time())}")
     chunks = split_content(content)
-    execution_order = 1
 
-    # todo maybe use sliding window (overlap some text between chunks) to preserve context between chunks
-    for chunk in chunks:
-        chunk_insights = call_ai_model(chunk, prompt)
-        chunk_insights_dict = json.loads(chunk_insights)
-        insights.append(chunk_insights_dict)
-        execution_order += 1
+    print(f"Generate and save embeddings for collection {collection.name}")
+    embeddings = create_embeddings(collection, chunks)
+    #todo compute_average_embedding(embeddings)
 
-    return json.dumps(chunk_insights_dict, indent=2)
-    # return json.dumps(insights, indent=2)
+    #langchain
+    # embedding_function = OpenAIEmbeddings()
+    # db = Chroma(embedding_function=embedding_function)
+    # db.similarity_search(query="tell me about monday soc 2 report")
+    #
+    # query = generate_embeddings("Summarize the key points about SOC2 controls")
+    # query_result = collection.query(query_embeddings=query, n_results=5)
+    #
+
+    similar_chunks = query_similar_chunks(collection, embeddings)
+    #combined_text = " ".join(chunk['text'] for chunk in similar_chunks)
+
+    print("Summarize report using model")
+    insights = call_model(similar_chunks, prompt)
+    insights_dict = json.loads(insights)
+
+    return json.dumps(insights_dict, indent=2)
 
 
-# todo remove spaces and redundant data to save tokens.
 def split_content(content, max_tokens=2000):
     paragraphs = content.split("\n\n")
     chunks = []

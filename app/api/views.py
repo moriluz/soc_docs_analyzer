@@ -23,13 +23,13 @@ class FileUploadView(APIView):
             uploaded_file = serializer.save()
             file_path = uploaded_file.file.path
 
-            print("Load template and render prompt")
+            print(f"Load template and render prompt for file {file_path}")
             prompt = render_prompt('system_prompt.jinja2')
 
             print("Extract and clean text to minimize tokens")
             content = extract_text_from_pdf(file_path)
 
-            print("Analyze document...")
+            print(f"Analyze document {file_path}")
             insights = analyze_document(content, prompt)
 
             return Response(json.loads(insights), status=status.HTTP_201_CREATED)

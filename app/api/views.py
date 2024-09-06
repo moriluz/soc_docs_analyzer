@@ -1,6 +1,5 @@
 import json
 
-import chromadb
 from openai import OpenAI
 from rest_framework import status
 from rest_framework.response import Response
@@ -12,7 +11,6 @@ from ..services.render_prompt import render_prompt
 from ..services.text_analysis import analyze_document
 
 client = OpenAI()
-chroma_client = chromadb.Client()
 
 
 class FileUploadView(APIView):
